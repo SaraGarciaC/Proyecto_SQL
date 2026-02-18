@@ -37,7 +37,7 @@ where l."language_id" = f."original_language_id";
 -- 5.Ordena las películas por duración de forma ascendente.
 select 
 "film_id" as "id_pelicula",
-"title"  as "nombre_pelicula",
+"title"  as "nombre_pelicula"
 from "film"
 order by "length";
 
@@ -97,7 +97,7 @@ select
 "rating" as "clasificacion",
 round( AVG("length"),2) as "promedio_duracion"
 from "film"
-group by "clasificacion";
+group by "rating";
 
 -- 14. Encuentra el título de todas las películas que tengan una duración mayor a 180 minutos.
 select "title" as "peliculas_mas_180min"
@@ -144,7 +144,7 @@ round(AVG(f."length"),2) as "promedio_duracion"
 from "film" f
 join "film_category" fc on f."film_id" = fc."film_id"
 join "category" c on fc."category_id" = c."category_id"
-group by "nombre_categoria"
+group by c."name"
 having AVG(f."length") > 110;
 
 -- 21. ¿Cuál es la media de duración del alquiler de las películas? 
@@ -165,7 +165,7 @@ select
 count(rental_id) as "total_alquileres",
 date("rental_date") as "fecha_alquiler"
 from "rental"
-group by "fecha_alquiler"
+group by date("rental_date")
 order by "total_alquileres" desc;
 
 -- 24. Encuentra las películas con una duración superior al promedio.
@@ -183,7 +183,7 @@ select
 to_char ("rental_date",'YYYY-MM') as "mes_alquiler",
 count ("rental_id") as "numero_alquileres"
 from "rental"
-group by "mes_alquiler"
+group by to_char ("rental_date",'YYYY-MM')
 order by "mes_alquiler";
 
 -- 26. Encuentra el promedio, la desviación estándar y varianza del total pagado.
@@ -222,14 +222,16 @@ order by f."film_id";
 -- 30. Obtener los actores y el número de películas en las que ha actuado.
 select 
 a."actor_id", 
-concat(a."first_name", ' ', a."last_name") as "nombre_actor",
+concat(a."Nombre", ' ', a."Apellido") as "nombre_actor",
 count(fa."film_id") as "total_peliculas"
 from "actor" a
 left join "film_actor" fa on a."actor_id" = fa."actor_id"
-group by a."actor_id", "nombre_actor"
+group by a."actor_id", a."Nombre", a."Apellido"
 order by "total_peliculas" desc;
 
+
 -- 31. Obtener todas las películas y mostrar los actores que han actuado en ellas, incluso si algunas películas no tienen actores asociados.
+
 select 
 f."film_id",
 f."title"as "nombre_pelicula", 
@@ -266,7 +268,7 @@ left join "inventory" i
 on i."film_id" = f."film_id"
 left join "rental" r
 on r."inventory_id" = i."inventory_id"
-group by "id_pelicula","nombre_pelicula"
+group by f."film_id",f."title"
 order by "id_pelicula";
 
 -- 34. Encuentra los 5 clientes que más dinero se hayan gastado con nosotros.
@@ -276,7 +278,7 @@ concat (c."first_name", ' ' , c."last_name") as "nombre_cliente",
 SUM(p."amount") as "total_gastado"
 from "customer" c
 join "payment" p on p."customer_id" = c."customer_id"
-group by c."customer_id", "nombre_cliente"
+group by c."customer_id", c."first_name", c."last_name"
 order by "total_gastado" desc
 limit 5;
 
